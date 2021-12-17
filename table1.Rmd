@@ -1,0 +1,39 @@
+---
+title: "table1_sl_outcomes"
+author: "Drew Walker"
+date: "9/13/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(table1)
+library(haven)
+```
+
+```{r read-data}
+sl_demo_raw <- read_csv("table1.csv")
+
+str(sl_demo_raw)
+
+sl_demo_raw$streetlight_evaluation_survey_complete <- as.factor(sl_demo_raw$streetlight_evaluation_survey_complete)
+sl_demo_raw$yqolsf_complete <- as.factor(sl_demo_raw$yqolsf_complete)
+
+sl_demo_raw$demographic_questionnaire_complete <- as.factor(sl_demo_raw$demographic_questionnaire_complete)
+
+sl_demo_raw$gender <- as.factor(sl_demo_raw$gender)
+
+sl_demo_raw$diagnosis <- as.factor(sl_demo_raw$diagnosis)
+
+sl_demo_raw$ethnicity <- as.factor(sl_demo_raw$ethnicity)
+
+sl_demo_raw$other_disease <- as.factor(sl_demo_raw$other_disease)
+
+sl_demo_clean <- sl_demo_raw %>% 
+  mutate(interview_requested = case_when(is.na(interview_request_name) ~ "No",
+                                         TRUE ~ "Yes"))
+sl_demo_clean$interview_requested <- as.factor(sl_demo_clean$interview_requested)
+
+table1(~streetlight_evaluation_survey_complete + yqolsf_complete + demographic_questionnaire_complete + gender + diagnosis + ethnicity + other_disease | interview_requested, data = sl_demo_clean)
+```
+
