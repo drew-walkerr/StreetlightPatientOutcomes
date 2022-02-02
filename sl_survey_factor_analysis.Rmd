@@ -27,6 +27,7 @@ sl_survey_scores <- read_csv("sl_survey_data.csv")
 sl_survey_scores <- sl_survey_scores %>% 
   filter(streetlight_evaluation_survey_complete == 2) %>% 
   select(-streetlight_evaluation_survey_complete,-record_id,-q31_experience, -q21_lounge_fun, -q22_lounge_friends, -q23_lounge_age,-q24_slmemb_ill,-q25_outpat_trans_talk,-q26_outpattrans_friend, -q27_adulttrans_talk,-q28_adulttrans_friend,-q30_cf_yearbook)
+describe(sl_survey_scores)
 
 ```
 
@@ -115,16 +116,16 @@ am at home \* Q14 (r35): Getting a good education
 <https://lavaan.ugent.be/tutorial/cfa.html>
 
 ```{r conf-factor-analysis}
-str(yqolsf_scores)
+str(sl_survey_scores)
 
 #Belief in self and family
 
-
+# need to change path, this is actually for YQOL EFA
 
 path <- ' self_and_family =~ r07 + r08 + r16 + r19 + r20 
           env_and_relationships =~ r24 + r26 + r27 + r32 + r34 + r35 '
 
-model <- cfa(path, data= yqolsf_scores)
+model <- cfa(path, data= sl_survey_scores)
 summary(model, fit.measures=TRUE)
 ```
 

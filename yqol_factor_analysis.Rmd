@@ -27,6 +27,7 @@ yqolsf_scores <- read_csv("yqolsf_factor_ready.csv")
 yqolsf_scores <- yqolsf_scores %>% 
   filter(yqolsf_complete == 2) %>% 
   select(-yqolsf_complete,-record_id)
+describe(yqolsf_scores)
 
 
 ```
@@ -55,8 +56,9 @@ ggplot(scree, aes(x = Factor_n, y = Eigenvalue, group = 1)) +
 ```
 
 ```{r efa-3-factor}
-fa.none <- fa(r=yqolsf_scores,nfactors = 3, fm="pa", max.iter=100, rotate="oblimin") 
+fa.none <- fa(r=yqolsf_scores,nfactors = 3, fm="mle", max.iter=200, rotate="oblimin") 
 print(fa.none)
+
 ```
 
 
