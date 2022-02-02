@@ -1,0 +1,130 @@
+---
+title: "sl_survey_factor_analysis"
+author: "Drew Walker"
+date: "12/17/2021"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(lavaan)
+library(psych)
+library(corrplot)
+library("psych")
+library(ggplot2)
+library(GPArotation)
+```
+
+# Load data
+
+```{r dataload}
+sl_survey_scores <- read_csv("sl_survey_data.csv")
+sl_survey_scores <- sl_survey_scores %>% 
+  filter(streetlight_evaluation_survey_complete == 2) %>% 
+  select(-streetlight_evaluation_survey_complete,-record_id,-q31_experience, -q21_lounge_fun, -q22_lounge_friends, -q23_lounge_age,-q24_slmemb_ill,-q25_outpat_trans_talk,-q26_outpattrans_friend, -q27_adulttrans_talk,-q28_adulttrans_friend,-q30_cf_yearbook)
+
+```
+
+# EFA 
+
+```{r efa}
+datamatrix <- cor(sl_survey_scores, method = "pearson", use = "complete.obs")
+corrplot(datamatrix, method="number")
+KMO(r=cor(sl_survey_scores,method = "pearson", use = "complete.obs"))
+cortest.bartlett(sl_survey_scores)
+det(cor(sl_survey_scores,method = "pearson", use = "complete.obs"))
+
+fafitfree <- fa(sl_survey_scores,nfactors = ncol(sl_survey_scores), rotate = "none")
+n_factors <- length(fafitfree$e.values)
+scree     <- data.frame(
+  Factor_n =  as.factor(1:n_factors), 
+  Eigenvalue = fafitfree$e.values)
+ggplot(scree, aes(x = Factor_n, y = Eigenvalue, group = 1)) + 
+  geom_point() + geom_line() +
+  xlab("Number of factors") +
+  ylab("Initial eigenvalue") +
+  labs( title = "Scree Plot", 
+        subtitle = "(Based on the unreduced correlation matrix)")
+
+```
+
+```{r efa-3-factor}
+fa.none <- fa(r=sl_survey_scores,nfactors = 3, fm="pa", max.iter=100, rotate="oblimin") 
+print(fa.none)
+```
+
+
+# CFA based on [@hoang2021]
+
+## Factor 1: Belief in self and family
+
+-   Q1 (r07): energy to do the things i want
+
+-   Q2: (r_missing) Feel good about self
+
+-   Q3: (r missing) I feel i am important to others
+
+-   Q4 (r08): pleased with how i look
+
+-   Q5 (r_missing) feel understood by family
+
+-   Q6 (r_missing) feel i am getting along with my family
+
+-   Q5 (r16): my family encourages me to do my best
+
+-   Q6 (r19): i feel i am getting along with my parents or guardians
+
+-   Q15 (r20): I feel my parents or guardians allow me to participate in
+    important decisions which affect me
+
+## Factor 2: Environment and relationships
+
+-   Q8 (r24): I'm happy with the friends I have
+-   Q9(r26): I feel i can take part in same activities as others my age
+-   Q10(r27): People my age treat me with respect
+
+Q12 (r32) I look forward to the future \* Q13 (r34): I feel safe when i
+am at home \* Q14 (r35): Getting a good education
+
+## NEW:
+
+### Removed:
+
+-   Q2: (r_missing) Feel good about self
+
+-   Q3: (r missing) I feel i am important to others
+
+-   Q5 (r_missing) feel understood by family
+
+-   Q6 (r_missing) feel i am getting along with my family
+
+-   Q11 (r_missing) Not in this questionnaire) Feel like my life is full
+    of interesting things to do \*Q7 (r_missing) I feel alone in my life
+
+### Added:
+
+-   Q? Know how to get the information i need(r36), *Q? Enjoy learning
+    new things (r37)* Q? Feel safe at school(r38) \*Q? (r11): i feel my
+    life has meaning
+
+<https://lavaan.ugent.be/tutorial/cfa.html>
+
+```{r conf-factor-analysis}
+str(yqolsf_scores)
+
+#Belief in self and family
+
+
+
+path <- ' self_and_family =~ r07 + r08 + r16 + r19 + r20 
+          env_and_relationships =~ r24 + r26 + r27 + r32 + r34 + r35 '
+
+model <- cfa(path, data= yqolsf_scores)
+summary(model, fit.measures=TRUE)
+```
+
