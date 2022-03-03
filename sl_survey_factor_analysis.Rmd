@@ -6,7 +6,6 @@ output: html_document
 editor_options: 
   markdown: 
     wrap: 72
-bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -26,12 +25,16 @@ library(GPArotation)
 sl_survey_scores <- read_csv("sl_survey_data.csv")
 sl_survey_scores <- sl_survey_scores %>% 
   filter(streetlight_evaluation_survey_complete == 2) %>% 
-  select(-streetlight_evaluation_survey_complete,-record_id,-q31_experience, -q21_lounge_fun, -q22_lounge_friends, -q23_lounge_age,-q24_slmemb_ill,-q25_outpat_trans_talk,-q26_outpattrans_friend, -q27_adulttrans_talk,-q28_adulttrans_friend,-q30_cf_yearbook)
+  select(-streetlight_evaluation_survey_complete,-record_id,-q31_experience, -q21_lounge_fun, -q22_lounge_friends, -q23_lounge_age,-q24_slmemb_ill,-q25_outpat_trans_talk,-q26_outpattrans_friend, -q27_adulttrans_talk,-q28_adulttrans_friend,-q30_cf_yearbook,-hospital_now)
 describe(sl_survey_scores)
+
+#Drop any? 
+#  simulation studies have found that serious problems may exist when univariate skewness is ≥2.0 and kurtosis is ≥7.0 
+
 
 ```
 
-# EFA 
+# EFA
 
 ```{r efa}
 datamatrix <- cor(sl_survey_scores, method = "pearson", use = "complete.obs")
@@ -54,78 +57,123 @@ ggplot(scree, aes(x = Factor_n, y = Eigenvalue, group = 1)) +
 
 ```
 
+![](http://127.0.0.1:39867/chunk_output/052A8F2CF5333BA4/8D377EBD/cgaqowjio2537/00000f.png?fixed_size=1)
+
 ```{r efa-3-factor}
 fa.none <- fa(r=sl_survey_scores,nfactors = 3, fm="pa", max.iter=100, rotate="oblimin") 
 print(fa.none)
+
 ```
 
+# Factor loadings
 
-# CFA based on [@hoang2021]
+## 3 Factor
 
-## Factor 1: Belief in self and family
+PA1:
 
--   Q1 (r07): energy to do the things i want
+-   q7: friends roomhang .68
 
--   Q2: (r_missing) Feel good about self
+    -   I felt like I was able to make friends when a group of
+        Streetlight members came to my room to hang out
 
--   Q3: (r missing) I feel i am important to others
+-    q8: talk badday .89
 
--   Q4 (r08): pleased with how i look
+    -   I felt like I could talk to someone from Streetlight when I was
+        having a bad day
 
--   Q5 (r_missing) feel understood by family
+-   q32: .67
 
--   Q6 (r_missing) feel i am getting along with my family
+    -   It helped to hang out or talk with someone from Streetlight when
+        I was having a bad day
 
--   Q5 (r16): my family encourages me to do my best
+-   q13: badday there .57
 
--   Q6 (r19): i feel i am getting along with my parents or guardians
+    -   I felt like people from Streetlight were there for me when I was
+        having a bad day
 
--   Q15 (r20): I feel my parents or guardians allow me to participate in
-    important decisions which affect me
+-    q14: there hang .70
 
-## Factor 2: Environment and relationships
+    -   I felt like people from Streetlight were there for me when I
+        needed to hang out with someone
 
--   Q8 (r24): I'm happy with the friends I have
--   Q9(r26): I feel i can take part in same activities as others my age
--   Q10(r27): People my age treat me with respect
+-   q15: sl friends .74
 
-Q12 (r32) I look forward to the future \* Q13 (r34): I feel safe when i
-am at home \* Q14 (r35): Getting a good education
+    -   People from Streetlight were my real friends
 
-## NEW:
+-   q16: hang better .40
 
-### Removed:
+    -   I felt better when I was hanging out with someone from
+        Streetlight
 
--   Q2: (r_missing) Feel good about self
+-   q18: imp treatment event .72
 
--   Q3: (r missing) I feel i am important to others
+    -   Streetlight recognized important events related to my treatment
 
--   Q5 (r_missing) feel understood by family
+-   q20: fundraise .46
 
--   Q6 (r_missing) feel i am getting along with my family
+    -   Someone from Streetlight told me about fundraising events
+        specific to my disease that happen around Gainesville
 
--   Q11 (r_missing) Not in this questionnaire) Feel like my life is full
-    of interesting things to do \*Q7 (r_missing) I feel alone in my life
+PA2:
 
-### Added:
+-    q5: diversion: .37
 
--   Q? Know how to get the information i need(r36), *Q? Enjoy learning
-    new things (r37)* Q? Feel safe at school(r38) \*Q? (r11): i feel my
-    life has meaning
+    -   Spending time with Streetlight members took my mind off of being
+        sick and living in the hospital
+
+-    q6: room hang fun .66
+
+    -   I had fun when a group of Streetlight members came to my room to
+        hang out
+
+-   q10: respect .37
+
+    -   People from Streetlight respected me
+
+-    q11: respect all .85
+
+    -   People from Streetlight respected everyone regardless of
+        racial/ethnic, cultural, or religious/spiritual background
+
+-   q12: imp .35
+
+    -   I felt like I was important to people from Streetlight
+
+-   q19: happy mem .66
+
+    -   I have at least one happy memory from my time in Streetlight
+
+PA3:
+
+-   q1: control .66
+
+-   q2: get along hosp .81
+
+-    q3: get along fam .77
+
+-   q4: easier tasks .92
+
+-   q17: eot good .48
+
+## 4-factor 
+
+```{r, efa-4}
+fa.four <- fa(r=sl_survey_scores,nfactors = 4, fm="pa", max.iter=100, rotate="oblimin") 
+print(fa.four)
+```
 
 <https://lavaan.ugent.be/tutorial/cfa.html>
 
 ```{r conf-factor-analysis}
-str(sl_survey_scores)
-
-#Belief in self and family
-
-# need to change path, this is actually for YQOL EFA
-
-path <- ' self_and_family =~ r07 + r08 + r16 + r19 + r20 
-          env_and_relationships =~ r24 + r26 + r27 + r32 + r34 + r35 '
-
-model <- cfa(path, data= sl_survey_scores)
-summary(model, fit.measures=TRUE)
+#str(sl_survey_scores)
+#
+##Belief in self and family
+#
+## need to change path, this is actually for YQOL EFA
+#
+#path <- ' self_and_family =~ r07 + r08 + r16 + r19 + r20 
+#          env_and_relationships =~ r24 + r26 + r27 + r32 #+ r34 + r35 '
+#
+#model <- cfa(path, data= sl_survey_scores)
+#summary(model, fit.measures=TRUE)
 ```
-
