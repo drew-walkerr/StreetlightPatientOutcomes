@@ -28,7 +28,8 @@ yqolsf_scores <- yqolsf_scores %>%
   filter(yqolsf_complete == 2) %>% 
   select(-yqolsf_complete,-record_id)
 describe(yqolsf_scores)
-
+yqolsf_descriptives <- describe(yqolsf_scores)
+write_csv(yqolsf_descriptives, "yqolsf_descriptives.csv")
 
 ```
 
@@ -52,13 +53,25 @@ ggplot(scree, aes(x = Factor_n, y = Eigenvalue, group = 1)) +
   ylab("Initial eigenvalue") +
   labs( title = "Scree Plot", 
         subtitle = "(Based on the unreduced correlation matrix)")
+alpha(sl_survey_scores)
 
 ```
 
 ```{r efa-3-factor}
-fa.none <- fa(r=yqolsf_scores,nfactors = 3, fm="mle", max.iter=200, rotate="oblimin") 
+fa.none <- fa(r=yqolsf_scores,nfactors = 3, fm="mle", max.iter=100, rotate="oblimin") 
 print(fa.none)
 
+
+loadings <- unclass(fa.none$loadings)
+h2 <- fa.none$communalities
+#There is also factors_data$communality which has same values
+u2 <- fa.none$uniquenesses
+com <- fa.none$complexity
+yqsol_factor_loadings <- cbind(loadings, h2, u2, com)
+yqsol_factor_loadings <- as.data.frame(yqsol_factor_loadings)
+yqsol_factor_loadings <- tibble::rownames_to_column(yqsol_factor_loadings, "question")
+
+write_csv(yqsol_factor_loadings, "yqsol_factor_loadings.csv")
 ```
 
 
