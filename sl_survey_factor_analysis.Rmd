@@ -181,6 +181,30 @@ fa.four <- fa(r=sl_survey_scores,nfactors = 4, fm="pa", max.iter=100, rotate="ob
 print(fa.four)
 ```
 
+
+```{r regression}
+yqolsf_scores_merge <- read_csv("yqolsf_factor_ready.csv")
+yqolsf_scores_merge <- yqolsf_scores_merge %>% 
+  filter(yqolsf_complete == 2) %>% 
+  select(-yqolsf_complete) %>%  
+  mutate(average_yqol = (r07+r08+r11+r13+r16+r19+r20+r24+r26+r27+r32+r34+r35+r36+r37+r38)/16)
+
+
+sl_survey_scores_merge <- read_csv("sl_survey_data.csv")
+sl_survey_scores_merge <- sl_survey_scores_merge %>% 
+  filter(streetlight_evaluation_survey_complete == 2) %>% 
+  select(-streetlight_evaluation_survey_complete,-q31_experience, -q21_lounge_fun, -q22_lounge_friends, -q23_lounge_age,-q24_slmemb_ill,-q25_outpat_trans_talk,-q26_outpattrans_friend, -q27_adulttrans_talk,-q28_adulttrans_friend,-q30_cf_yearbook,-hospital_now) %>%
+  mutate(average_sl = (q1_control+q2_getalong_hosp+q3_getalong_fam+q4_easier_tasks+q5_diversion+q6_roomhang_fun+q7_friends_roomhang+q8_talk_badday+q_32+q10_respect+q11_respect_all+q12_imp+q13_badday_there+q14_there_hang+q15_sl_friends+q16_hang_better+q17_eot_good+q18_imp_treat_event+q19_happy_mem+q20_fundraise)/20)
+
+scores_merged <- left_join(yqolsf_scores_merge, sl_survey_scores_merge, by = "record_id")
+scores_merged_clean <- scores_merged %>% 
+  select(average_sl,average_yqol,record_id)
+
+model <- lm(average_yqol~average_sl,data=scores_merged_clean)
+summary(model)
+describe(scores_merged_clean)
+```
+
 <https://lavaan.ugent.be/tutorial/cfa.html>
 
 # r conf-factor-analysis
