@@ -51,17 +51,46 @@ sl_demo_clean$school___6 <- as.factor(sl_demo_clean$school___6)
 sl_demo_clean$school___7 <- as.factor(sl_demo_clean$school___7)
 sl_demo_clean$school___8 <- as.factor(sl_demo_clean$school___8)
 sl_demo_clean$school___9 <- as.factor(sl_demo_clean$school___9)
+sl_demo_clean$hospital_now <- as.factor(sl_demo_clean$hospital_now)
 
 
-table1(~streetlight_evaluation_survey_complete + yqolsf_complete + demographic_questionnaire_complete + gender + diagnosis + ethnicity + other_disease + interview_requested + age + yqol_outcomes_avg +sl_outcomes_avg + school___1 +school___2+ school___3+ school___4+school___5+ school___6+ school___7+ school___8+ school___9, data = sl_demo_clean)
+table1(~streetlight_evaluation_survey_complete + yqolsf_complete + demographic_questionnaire_complete + gender + diagnosis + ethnicity + other_disease + interview_requested + age + yqol_outcomes_avg +sl_outcomes_avg + school___1 +school___2+ school___3+ school___4+school___5+ school___6+ school___7+ school___8+ school___9 + hospital_now, data = sl_demo_clean )
 ```
-# Chi square sensitivity/logistic regressions for qual of life and SL eval outcome scores
-* if ppl selected to interview
-* if ppl were in hospital 
-* differences across disease populations 
-* association between both scores 
+# Sensitivity/logistic regressions for qual of life and SL eval outcome scores
+* if ppl selected to interview-- no significant relationship
+* if ppl were in hospital -- no sig relationship 
+* differences across disease populations  -- no sig relationship
+* association between scores  --
 
-```{r}
+```{r regressions}
+sl_demo_clean$hospital_now
+model_interview_yqol <- lm(yqol_outcomes_avg~interview_requested, data = sl_demo_clean)
+summary(model_interview_yqol)
 
+model_interview_sl <- lm(sl_outcomes_avg~interview_requested, data= sl_demo_clean)
+summary(model_interview_sl)
+
+# No significant associations between requested interview and YQOL/SL 
+
+model_hospital_yqol <- lm(yqol_outcomes_avg~hospital_now, data = sl_demo_clean)
+summary(model_hospital_yqol)
+
+model_hospital_sl <- lm(sl_outcomes_avg~hospital_now, data= sl_demo_clean)
+summary(model_hospital_sl)
+
+# No significant associaitons here whether hospitalized/not- may point to need to continue services outpatient related to QOL 
+
+model_diagnosis_yqol <- lm(yqol_outcomes_avg~diagnosis, data = sl_demo_clean)
+summary(model_diagnosis_yqol)
+
+model_diagnosis_sl <- lm(sl_outcomes_avg~diagnosis, data= sl_demo_clean)
+summary(model_diagnosis_sl)
+
+# No significant associations here
+
+model_sl_and_yqol <- lm(yqol_outcomes_avg ~ sl_outcomes_avg, data = sl_demo_clean)
+summary(model_sl_and_yqol)
+
+# none found here
 ```
 
