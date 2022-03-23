@@ -2,7 +2,9 @@
 title: "sl_survey_factor_analysis"
 author: "Drew Walker"
 date: "9/13/2021"
-output: html_document
+output:
+  html_document:
+    self_contained: no
 ---
 
 ```{r setup, include=FALSE}

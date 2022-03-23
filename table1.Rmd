@@ -31,9 +31,37 @@ sl_demo_raw$other_disease <- as.factor(sl_demo_raw$other_disease)
 
 sl_demo_clean <- sl_demo_raw %>% 
   mutate(interview_requested = case_when(is.na(interview_request_name) ~ "No",
-                                         TRUE ~ "Yes"))
+                                         TRUE ~ "Yes"),
+         sl_outcomes_avg = (q1_control+q2_getalong_hosp+q3_getalong_fam+q4_easier_tasks+q5_diversion+q6_roomhang_fun+q7_friends_roomhang+q8_talk_badday+q_32+q10_respect+q11_respect_all+q12_imp+q13_badday_there+q14_there_hang+q15_sl_friends+q16_hang_better+q17_eot_good+q18_imp_treat_event+q19_happy_mem+q20_fundraise)/20,
+         yqol_outcomes_avg = (r07+r08+r11+r13+r16+r19+r20+r24+r26+r27+r32+r34+r35+r36+r37+r38)/16)
+           
+
+# ones not applicable to all
+#q24_slmemb_ill, q25_outpat_trans_talk, q26_outpattrans_friend, q27_adulttrans_talk, q28_adulttrans_friend, q30_cf_yearbook, q31_experience
+           
+#q21_lounge_fun,q23_lounge_age 
 sl_demo_clean$interview_requested <- as.factor(sl_demo_clean$interview_requested)
 
-table1(~streetlight_evaluation_survey_complete + yqolsf_complete + demographic_questionnaire_complete + gender + diagnosis + ethnicity + other_disease | interview_requested, data = sl_demo_clean)
+sl_demo_clean$school___1 <- as.factor(sl_demo_clean$school___1)
+sl_demo_clean$school___2 <- as.factor(sl_demo_clean$school___2)
+sl_demo_clean$school___3 <- as.factor(sl_demo_clean$school___3)
+sl_demo_clean$school___4 <- as.factor(sl_demo_clean$school___4)
+sl_demo_clean$school___5 <- as.factor(sl_demo_clean$school___5)
+sl_demo_clean$school___6 <- as.factor(sl_demo_clean$school___6)
+sl_demo_clean$school___7 <- as.factor(sl_demo_clean$school___7)
+sl_demo_clean$school___8 <- as.factor(sl_demo_clean$school___8)
+sl_demo_clean$school___9 <- as.factor(sl_demo_clean$school___9)
+
+
+table1(~streetlight_evaluation_survey_complete + yqolsf_complete + demographic_questionnaire_complete + gender + diagnosis + ethnicity + other_disease + interview_requested + age + yqol_outcomes_avg +sl_outcomes_avg + school___1 +school___2+ school___3+ school___4+school___5+ school___6+ school___7+ school___8+ school___9, data = sl_demo_clean)
+```
+# Chi square sensitivity/logistic regressions for qual of life and SL eval outcome scores
+* if ppl selected to interview
+* if ppl were in hospital 
+* differences across disease populations 
+* association between both scores 
+
+```{r}
+
 ```
 

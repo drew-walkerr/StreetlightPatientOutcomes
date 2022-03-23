@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Drew Walker" />
+
+
+<title>sl_survey_factor_analysis</title>
+
+<script src="sl_survey_factor_analysis_files/header-attrs-2.7/header-attrs.js"></script>
+<script src="sl_survey_factor_analysis_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="sl_survey_factor_analysis_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="sl_survey_factor_analysis_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="sl_survey_factor_analysis_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="sl_survey_factor_analysis_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="sl_survey_factor_analysis_files/navigation-1.1/tabsets.js"></script>
+<link href="sl_survey_factor_analysis_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="sl_survey_factor_analysis_files/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">sl_survey_factor_analysis</h1>
+<h4 class="author">Drew Walker</h4>
+<h4 class="date">9/13/2021</h4>
+
+</div>
+
+
+<div id="load-data" class="section level1">
+<h1>Load data</h1>
+<pre class="r"><code>sl_survey_scores &lt;- read_csv(&quot;sl_survey_data.csv&quot;)</code></pre>
+<pre><code>## 
+## -- Column specification --------------------------------------------------------
+## cols(
+##   .default = col_double(),
+##   q31_experience = col_character()
+## )
+## i Use `spec()` for the full column specifications.</code></pre>
+<pre class="r"><code>sl_survey_scores &lt;- sl_survey_scores %&gt;% 
+  filter(streetlight_evaluation_survey_complete == 2) %&gt;% 
+  select(-streetlight_evaluation_survey_complete,-record_id,-q31_experience, -q21_lounge_fun, -q22_lounge_friends, -q23_lounge_age,-q24_slmemb_ill,-q25_outpat_trans_talk,-q26_outpattrans_friend, -q27_adulttrans_talk,-q28_adulttrans_friend,-q30_cf_yearbook,-hospital_now)
+describe(sl_survey_scores)</code></pre>
+<pre><code>##                     vars  n mean   sd median trimmed  mad min max range  skew
+## q1_control             1 71 4.31 0.86    5.0    4.44 0.00   2   5     3 -1.03
+## q2_getalong_hosp       2 70 4.20 1.04    5.0    4.38 0.00   1   5     4 -1.08
+## q3_getalong_fam        3 70 4.06 1.23    4.5    4.27 0.74   1   5     4 -1.18
+## q4_easier_tasks        4 71 4.18 1.03    5.0    4.33 0.00   1   5     4 -1.13
+## q5_diversion           5 71 4.80 0.58    5.0    4.96 0.00   2   5     3 -3.07
+## q6_roomhang_fun        6 71 4.87 0.38    5.0    4.98 0.00   3   5     2 -2.96
+## q7_friends_roomhang    7 71 4.61 0.67    5.0    4.74 0.00   2   5     3 -1.68
+## q8_talk_badday         8 71 4.39 1.03    5.0    4.63 0.00   1   5     4 -1.74
+## q_32                   9 70 4.47 0.93    5.0    4.68 0.00   1   5     4 -2.01
+## q10_respect           10 71 4.94 0.29    5.0    5.00 0.00   3   5     2 -5.36
+## q11_respect_all       11 70 4.91 0.33    5.0    5.00 0.00   3   5     2 -4.01
+## q12_imp               12 71 4.73 0.58    5.0    4.86 0.00   2   5     3 -2.43
+## q13_badday_there      13 71 4.63 0.83    5.0    4.86 0.00   1   5     4 -2.47
+## q14_there_hang        14 71 4.61 0.76    5.0    4.79 0.00   2   5     3 -1.86
+## q15_sl_friends        15 70 4.26 1.03    5.0    4.46 0.00   1   5     4 -1.46
+## q16_hang_better       16 71 4.54 0.67    5.0    4.65 0.00   2   5     3 -1.38
+## q17_eot_good          17 71 4.38 0.93    5.0    4.56 0.00   1   5     4 -1.75
+## q18_imp_treat_event   18 69 4.46 0.98    5.0    4.67 0.00   1   5     4 -1.94
+## q19_happy_mem         19 70 4.74 0.76    5.0    4.95 0.00   1   5     4 -3.33
+## q20_fundraise         20 67 3.46 1.47    4.0    3.56 1.48   1   5     4 -0.42
+##                     kurtosis   se
+## q1_control              0.17 0.10
+## q2_getalong_hosp        0.13 0.12
+## q3_getalong_fam         0.21 0.15
+## q4_easier_tasks         0.65 0.12
+## q5_diversion            9.21 0.07
+## q6_roomhang_fun         8.64 0.04
+## q7_friends_roomhang     2.48 0.08
+## q8_talk_badday          2.19 0.12
+## q_32                    3.93 0.11
+## q10_respect            29.82 0.03
+## q11_respect_all        16.70 0.04
+## q12_imp                 6.35 0.07
+## q13_badday_there        5.85 0.10
+## q14_there_hang          2.54 0.09
+## q15_sl_friends          1.49 0.12
+## q16_hang_better         1.64 0.08
+## q17_eot_good            3.09 0.11
+## q18_imp_treat_event     3.21 0.12
+## q19_happy_mem          11.07 0.09
+## q20_fundraise          -1.26 0.18</code></pre>
+<pre class="r"><code>#Drop any? 
+#  simulation studies have found that serious problems may exist when univariate skewness is ≥2.0 and kurtosis is ≥7.0 
+sl_survey_descriptives &lt;- describe(sl_survey_scores)
+write_csv(sl_survey_descriptives, &quot;sl_survey_descriptives.csv&quot;)</code></pre>
+</div>
+<div id="efa" class="section level1">
+<h1>EFA</h1>
+<div id="exploratory-analyses-eigenvalue-scree-plot" class="section level2">
+<h2>Exploratory analyses, Eigenvalue scree plot</h2>
+<pre class="r"><code>datamatrix &lt;- cor(sl_survey_scores, method = &quot;pearson&quot;, use = &quot;complete.obs&quot;)
+corrplot(datamatrix, method=&quot;number&quot;)</code></pre>
+<p><img src="sl_survey_factor_analysis_files/figure-html/efa-1.png" width="672" /></p>
+<pre class="r"><code>KMO(r=cor(sl_survey_scores,method = &quot;pearson&quot;, use = &quot;complete.obs&quot;))</code></pre>
+<pre><code>## Kaiser-Meyer-Olkin factor adequacy
+## Call: KMO(r = cor(sl_survey_scores, method = &quot;pearson&quot;, use = &quot;complete.obs&quot;))
+## Overall MSA =  0.82
+## MSA for each item = 
+##          q1_control    q2_getalong_hosp     q3_getalong_fam     q4_easier_tasks 
+##                0.90                0.74                0.78                0.85 
+##        q5_diversion     q6_roomhang_fun q7_friends_roomhang      q8_talk_badday 
+##                0.79                0.80                0.79                0.83 
+##                q_32         q10_respect     q11_respect_all             q12_imp 
+##                0.82                0.45                0.66                0.84 
+##    q13_badday_there      q14_there_hang      q15_sl_friends     q16_hang_better 
+##                0.90                0.86                0.89                0.85 
+##        q17_eot_good q18_imp_treat_event       q19_happy_mem       q20_fundraise 
+##                0.87                0.81                0.75                0.90</code></pre>
+<pre class="r"><code>cortest.bartlett(sl_survey_scores)</code></pre>
+<pre><code>## R was not square, finding R from data</code></pre>
+<pre><code>## $chisq
+## [1] 1111.382
+## 
+## $p.value
+## [1] 5.306113e-130
+## 
+## $df
+## [1] 190</code></pre>
+<pre class="r"><code>det(cor(sl_survey_scores,method = &quot;pearson&quot;, use = &quot;complete.obs&quot;))</code></pre>
+<pre><code>## [1] 2.069599e-08</code></pre>
+<pre class="r"><code>fafitfree &lt;- fa(sl_survey_scores,nfactors = ncol(sl_survey_scores), rotate = &quot;none&quot;)
+n_factors &lt;- length(fafitfree$e.values)
+scree     &lt;- data.frame(
+  Factor_n =  as.factor(1:n_factors), 
+  Eigenvalue = fafitfree$e.values)
+ggplot(scree, aes(x = Factor_n, y = Eigenvalue, group = 1)) + 
+  geom_point() + geom_line() +
+  xlab(&quot;Number of factors&quot;) +
+  ylab(&quot;Initial eigenvalue&quot;) +
+  labs( title = &quot;Scree Plot&quot;, 
+        subtitle = &quot;(Based on the unreduced correlation matrix)&quot;)</code></pre>
+<p><img src="sl_survey_factor_analysis_files/figure-html/efa-2.png" width="672" /></p>
+<pre class="r"><code>alpha(sl_survey_scores)</code></pre>
+<pre><code>## 
+## Reliability analysis   
+## Call: alpha(x = sl_survey_scores)
+## 
+##   raw_alpha std.alpha G6(smc) average_r S/N   ase mean   sd median_r
+##       0.91      0.92    0.96      0.35  11 0.014  4.5 0.53     0.37
+## 
+##  lower alpha upper     95% confidence boundaries
+## 0.88 0.91 0.94 
+## 
+##  Reliability if an item is dropped:
+##                     raw_alpha std.alpha G6(smc) average_r  S/N alpha se var.r
+## q1_control               0.90      0.91    0.96      0.35 10.1    0.015 0.038
+## q2_getalong_hosp         0.90      0.91    0.96      0.35 10.3    0.015 0.037
+## q3_getalong_fam          0.91      0.91    0.96      0.35 10.4    0.014 0.037
+## q4_easier_tasks          0.91      0.91    0.96      0.36 10.5    0.015 0.035
+## q5_diversion             0.91      0.91    0.96      0.35 10.2    0.014 0.038
+## q6_roomhang_fun          0.91      0.91    0.96      0.35 10.3    0.014 0.037
+## q7_friends_roomhang      0.91      0.91    0.96      0.35 10.3    0.014 0.038
+## q8_talk_badday           0.90      0.91    0.96      0.34  9.9    0.015 0.035
+## q_32                     0.90      0.91    0.96      0.34 10.0    0.015 0.035
+## q10_respect              0.91      0.92    0.96      0.38 11.7    0.014 0.030
+## q11_respect_all          0.91      0.92    0.96      0.37 11.2    0.014 0.033
+## q12_imp                  0.91      0.91    0.96      0.35 10.3    0.014 0.039
+## q13_badday_there         0.90      0.91    0.96      0.34  9.8    0.015 0.036
+## q14_there_hang           0.91      0.91    0.96      0.35 10.1    0.015 0.036
+## q15_sl_friends           0.91      0.91    0.96      0.35 10.2    0.015 0.037
+## q16_hang_better          0.91      0.91    0.96      0.35 10.1    0.015 0.038
+## q17_eot_good             0.91      0.91    0.96      0.35 10.4    0.014 0.038
+## q18_imp_treat_event      0.91      0.91    0.96      0.36 10.5    0.014 0.036
+## q19_happy_mem            0.91      0.92    0.96      0.36 10.8    0.014 0.036
+## q20_fundraise            0.91      0.91    0.96      0.36 10.6    0.014 0.035
+##                     med.r
+## q1_control           0.36
+## q2_getalong_hosp     0.38
+## q3_getalong_fam      0.38
+## q4_easier_tasks      0.38
+## q5_diversion         0.36
+## q6_roomhang_fun      0.38
+## q7_friends_roomhang  0.38
+## q8_talk_badday       0.36
+## q_32                 0.35
+## q10_respect          0.40
+## q11_respect_all      0.40
+## q12_imp              0.36
+## q13_badday_there     0.35
+## q14_there_hang       0.36
+## q15_sl_friends       0.36
+## q16_hang_better      0.36
+## q17_eot_good         0.37
+## q18_imp_treat_event  0.38
+## q19_happy_mem        0.38
+## q20_fundraise        0.38
+## 
+##  Item statistics 
+##                      n raw.r std.r r.cor r.drop mean   sd
+## q1_control          71  0.73  0.72  0.70   0.69  4.3 0.86
+## q2_getalong_hosp    70  0.69  0.66  0.65   0.64  4.2 1.04
+## q3_getalong_fam     70  0.68  0.62  0.61   0.59  4.1 1.23
+## q4_easier_tasks     71  0.66  0.59  0.59   0.60  4.2 1.03
+## q5_diversion        71  0.63  0.68  0.68   0.60  4.8 0.58
+## q6_roomhang_fun     71  0.53  0.64  0.64   0.51  4.9 0.38
+## q7_friends_roomhang 71  0.61  0.65  0.64   0.57  4.6 0.67
+## q8_talk_badday      71  0.79  0.77  0.78   0.75  4.4 1.03
+## q_32                70  0.77  0.74  0.74   0.73  4.5 0.93
+## q10_respect         71  0.15  0.24  0.22   0.12  4.9 0.29
+## q11_respect_all     70  0.24  0.37  0.36   0.21  4.9 0.33
+## q12_imp             71  0.60  0.64  0.62   0.56  4.7 0.58
+## q13_badday_there    71  0.81  0.80  0.80   0.79  4.6 0.83
+## q14_there_hang      71  0.68  0.72  0.71   0.64  4.6 0.76
+## q15_sl_friends      70  0.69  0.67  0.65   0.64  4.3 1.03
+## q16_hang_better     71  0.66  0.70  0.68   0.62  4.5 0.67
+## q17_eot_good        71  0.63  0.61  0.58   0.57  4.4 0.93
+## q18_imp_treat_event 69  0.62  0.57  0.56   0.56  4.5 0.98
+## q19_happy_mem       70  0.40  0.48  0.47   0.35  4.7 0.76
+## q20_fundraise       67  0.63  0.54  0.52   0.54  3.5 1.47
+## 
+## Non missing response frequency for each item
+##                        1    2    3    4    5 miss
+## q1_control          0.00 0.04 0.13 0.31 0.52 0.03
+## q2_getalong_hosp    0.01 0.07 0.16 0.21 0.54 0.04
+## q3_getalong_fam     0.06 0.10 0.07 0.27 0.50 0.04
+## q4_easier_tasks     0.03 0.03 0.20 0.23 0.52 0.03
+## q5_diversion        0.00 0.01 0.04 0.07 0.87 0.03
+## q6_roomhang_fun     0.00 0.00 0.01 0.10 0.89 0.03
+## q7_friends_roomhang 0.00 0.01 0.06 0.24 0.69 0.03
+## q8_talk_badday      0.03 0.06 0.07 0.18 0.66 0.03
+## q_32                0.03 0.01 0.09 0.20 0.67 0.04
+## q10_respect         0.00 0.00 0.01 0.03 0.96 0.03
+## q11_respect_all     0.00 0.00 0.01 0.06 0.93 0.04
+## q12_imp             0.00 0.01 0.03 0.17 0.79 0.03
+## q13_badday_there    0.01 0.03 0.06 0.11 0.79 0.03
+## q14_there_hang      0.00 0.03 0.08 0.14 0.75 0.03
+## q15_sl_friends      0.03 0.06 0.09 0.29 0.54 0.04
+## q16_hang_better     0.00 0.01 0.06 0.31 0.62 0.03
+## q17_eot_good        0.03 0.01 0.10 0.27 0.59 0.03
+## q18_imp_treat_event 0.03 0.03 0.09 0.16 0.70 0.05
+## q19_happy_mem       0.01 0.03 0.01 0.09 0.86 0.04
+## q20_fundraise       0.15 0.13 0.18 0.18 0.36 0.08</code></pre>
+<p><img src="http://127.0.0.1:39867/chunk_output/052A8F2CF5333BA4/8D377EBD/cgaqowjio2537/00000f.png?fixed_size=1" /></p>
+<div id="factor-model" class="section level3">
+<h3>3 Factor model</h3>
+<pre class="r"><code>fa.none &lt;- fa(r=sl_survey_scores,nfactors = 3, fm=&quot;mle&quot;, max.iter=100, rotate=&quot;oblimin&quot;) 
+print(fa.none)</code></pre>
+<pre><code>## Factor Analysis using method =  ml
+## Call: fa(r = sl_survey_scores, nfactors = 3, rotate = &quot;oblimin&quot;, max.iter = 100, 
+##     fm = &quot;mle&quot;)
+## Standardized loadings (pattern matrix) based upon correlation matrix
+##                       ML1   ML2   ML3   h2   u2 com
+## q1_control           0.06  0.68  0.23 0.61 0.39 1.2
+## q2_getalong_hosp    -0.05  0.82  0.12 0.68 0.32 1.1
+## q3_getalong_fam      0.06  0.74  0.00 0.60 0.40 1.0
+## q4_easier_tasks      0.02  0.90 -0.16 0.80 0.20 1.1
+## q5_diversion         0.25  0.31  0.38 0.47 0.53 2.7
+## q6_roomhang_fun      0.26 -0.04  0.71 0.68 0.32 1.3
+## q7_friends_roomhang  0.61 -0.13  0.30 0.51 0.49 1.6
+## q8_talk_badday       0.96 -0.02 -0.01 0.90 0.10 1.0
+## q_32                 0.80  0.22 -0.14 0.79 0.21 1.2
+## q10_respect         -0.21  0.20  0.33 0.13 0.87 2.4
+## q11_respect_all     -0.22  0.09  0.79 0.57 0.43 1.2
+## q12_imp              0.26  0.22  0.36 0.39 0.61 2.6
+## q13_badday_there     0.55  0.35  0.10 0.67 0.33 1.8
+## q14_there_hang       0.62 -0.09  0.43 0.68 0.32 1.8
+## q15_sl_friends       0.69  0.03  0.01 0.50 0.50 1.0
+## q16_hang_better      0.30  0.22  0.40 0.47 0.53 2.4
+## q17_eot_good         0.08  0.53  0.17 0.40 0.60 1.3
+## q18_imp_treat_event  0.64  0.04 -0.07 0.42 0.58 1.0
+## q19_happy_mem        0.04  0.01  0.74 0.57 0.43 1.0
+## q20_fundraise        0.39  0.38 -0.20 0.41 0.59 2.5
+## 
+##                        ML1  ML2  ML3
+## SS loadings           4.56 3.74 2.95
+## Proportion Var        0.23 0.19 0.15
+## Cumulative Var        0.23 0.41 0.56
+## Proportion Explained  0.41 0.33 0.26
+## Cumulative Proportion 0.41 0.74 1.00
+## 
+##  With factor correlations of 
+##      ML1  ML2  ML3
+## ML1 1.00 0.47 0.33
+## ML2 0.47 1.00 0.16
+## ML3 0.33 0.16 1.00
+## 
+## Mean item complexity =  1.6
+## Test of the hypothesis that 3 factors are sufficient.
+## 
+## The degrees of freedom for the null model are  190  and the objective function was  17.23 with Chi Square of  1111.38
+## The degrees of freedom for the model are 133  and the objective function was  5.89 
+## 
+## The root mean square of the residuals (RMSR) is  0.07 
+## The df corrected root mean square of the residuals is  0.09 
+## 
+## The harmonic number of observations is  70 with the empirical chi square  135.77  with prob &lt;  0.42 
+## The total number of observations was  73  with Likelihood Chi Square =  368.13  with prob &lt;  6e-24 
+## 
+## Tucker Lewis Index of factoring reliability =  0.621
+## RMSEA index =  0.155  and the 90 % confidence intervals are  0.138 0.176
+## BIC =  -202.5
+## Fit based upon off diagonal values = 0.97
+## Measures of factor score adequacy             
+##                                                    ML1  ML2  ML3
+## Correlation of (regression) scores with factors   0.97 0.96 0.93
+## Multiple R square of scores with factors          0.95 0.91 0.87
+## Minimum correlation of possible factor scores     0.90 0.83 0.74</code></pre>
+<pre class="r"><code>loadings &lt;- unclass(fa.none$loadings)
+h2 &lt;- fa.none$communalities
+#There is also factors_data$communality which has same values
+u2 &lt;- fa.none$uniquenesses
+com &lt;- fa.none$complexity
+question &lt;- fa.none$complexity
+sl_survey_factor_data &lt;- cbind(loadings, h2, u2, com)
+sl_survey_factor_data &lt;- as.data.frame(sl_survey_factor_data)
+sl_survey_factor_data &lt;- tibble::rownames_to_column(sl_survey_factor_data, &quot;question&quot;)
+
+write_csv(sl_survey_factor_data, &quot;sl_survey_loadings.csv&quot;)</code></pre>
+</div>
+</div>
+</div>
+<div id="factor-loadings" class="section level1">
+<h1>Factor loadings</h1>
+<div id="factor-loadings-1" class="section level2">
+<h2>3 Factor loadings</h2>
+<p>PA1:</p>
+<ul>
+<li><p>q7: friends roomhang .68</p>
+<ul>
+<li>I felt like I was able to make friends when a group of Streetlight members came to my room to hang out</li>
+</ul></li>
+<li><p>q8: talk badday .89</p></li>
+</ul>
+<pre><code>-   I felt like I could talk to someone from Streetlight when I was
+    having a bad day</code></pre>
+<ul>
+<li><p>q32: .67</p>
+<ul>
+<li>It helped to hang out or talk with someone from Streetlight when I was having a bad day</li>
+</ul></li>
+<li><p>q13: badday there .57</p>
+<ul>
+<li>I felt like people from Streetlight were there for me when I was having a bad day</li>
+</ul></li>
+<li><p>q14: there hang .70</p></li>
+</ul>
+<pre><code>-   I felt like people from Streetlight were there for me when I
+    needed to hang out with someone</code></pre>
+<ul>
+<li><p>q15: sl friends .74</p>
+<ul>
+<li>People from Streetlight were my real friends</li>
+</ul></li>
+<li><p>q16: hang better .40</p>
+<ul>
+<li>I felt better when I was hanging out with someone from Streetlight</li>
+</ul></li>
+<li><p>q18: imp treatment event .72</p>
+<ul>
+<li>Streetlight recognized important events related to my treatment</li>
+</ul></li>
+<li><p>q20: fundraise .46</p>
+<ul>
+<li>Someone from Streetlight told me about fundraising events specific to my disease that happen around Gainesville</li>
+</ul></li>
+</ul>
+<p>PA2:</p>
+<ul>
+<li>q5: diversion: .37</li>
+</ul>
+<pre><code>-   Spending time with Streetlight members took my mind off of being
+    sick and living in the hospital</code></pre>
+<ul>
+<li>q6: room hang fun .66</li>
+</ul>
+<pre><code>-   I had fun when a group of Streetlight members came to my room to
+    hang out</code></pre>
+<ul>
+<li><p>q10: respect .37</p>
+<ul>
+<li>People from Streetlight respected me</li>
+</ul></li>
+<li><p>q11: respect all .85</p></li>
+</ul>
+<pre><code>-   People from Streetlight respected everyone regardless of
+    racial/ethnic, cultural, or religious/spiritual background</code></pre>
+<ul>
+<li><p>q12: imp .35</p>
+<ul>
+<li>I felt like I was important to people from Streetlight</li>
+</ul></li>
+<li><p>q19: happy mem .66</p>
+<ul>
+<li>I have at least one happy memory from my time in Streetlight</li>
+</ul></li>
+</ul>
+<p>PA3:</p>
+<ul>
+<li><p>q1: control .66</p>
+<ul>
+<li></li>
+</ul></li>
+<li><p>q2: get along hosp .81</p></li>
+<li><p>q3: get along fam .77</p></li>
+<li><p>q4: easier tasks .92</p></li>
+<li><p>q17: eot good .48</p></li>
+</ul>
+</div>
+<div id="factor" class="section level2">
+<h2>4-factor</h2>
+<pre class="r"><code>fa.four &lt;- fa(r=sl_survey_scores,nfactors = 4, fm=&quot;pa&quot;, max.iter=100, rotate=&quot;oblimin&quot;) 
+print(fa.four)</code></pre>
+<pre><code>## Factor Analysis using method =  pa
+## Call: fa(r = sl_survey_scores, nfactors = 4, rotate = &quot;oblimin&quot;, max.iter = 100, 
+##     fm = &quot;pa&quot;)
+## Standardized loadings (pattern matrix) based upon correlation matrix
+##                       PA1   PA3   PA2   PA4   h2   u2 com
+## q1_control           0.15  0.64  0.10  0.19 0.60 0.40 1.3
+## q2_getalong_hosp     0.00  0.79  0.06  0.10 0.66 0.34 1.0
+## q3_getalong_fam      0.08  0.75 -0.07  0.17 0.64 0.36 1.1
+## q4_easier_tasks     -0.07  0.94 -0.04 -0.07 0.83 0.17 1.0
+## q5_diversion         0.13  0.32  0.54 -0.06 0.54 0.46 1.8
+## q6_roomhang_fun      0.32 -0.09  0.58  0.22 0.67 0.33 2.0
+## q7_friends_roomhang  0.75 -0.16  0.11  0.22 0.63 0.37 1.3
+## q8_talk_badday       0.82  0.07  0.10 -0.11 0.80 0.20 1.1
+## q_32                 0.62  0.31  0.02 -0.10 0.66 0.34 1.5
+## q10_respect          0.05  0.14 -0.18  0.80 0.61 0.39 1.2
+## q11_respect_all     -0.10  0.01  0.45  0.67 0.77 0.23 1.8
+## q12_imp              0.18  0.24  0.44  0.01 0.43 0.57 1.9
+## q13_badday_there     0.48  0.38  0.19 -0.08 0.66 0.34 2.3
+## q14_there_hang       0.60 -0.08  0.43  0.00 0.69 0.31 1.9
+## q15_sl_friends       0.81  0.04 -0.12  0.07 0.63 0.37 1.1
+## q16_hang_better      0.29  0.20  0.45 -0.01 0.51 0.49 2.1
+## q17_eot_good         0.05  0.51  0.30 -0.12 0.44 0.56 1.8
+## q18_imp_treat_event  0.75  0.04 -0.16 -0.06 0.53 0.47 1.1
+## q19_happy_mem       -0.07  0.00  0.85  0.00 0.69 0.31 1.0
+## q20_fundraise        0.40  0.38 -0.09 -0.23 0.46 0.54 2.7
+## 
+##                        PA1  PA3  PA2  PA4
+## SS loadings           4.44 3.79 2.78 1.43
+## Proportion Var        0.22 0.19 0.14 0.07
+## Cumulative Var        0.22 0.41 0.55 0.62
+## Proportion Explained  0.36 0.30 0.22 0.11
+## Cumulative Proportion 0.36 0.66 0.89 1.00
+## 
+##  With factor correlations of 
+##      PA1  PA3  PA2  PA4
+## PA1 1.00 0.44 0.37 0.04
+## PA3 0.44 1.00 0.17 0.01
+## PA2 0.37 0.17 1.00 0.25
+## PA4 0.04 0.01 0.25 1.00
+## 
+## Mean item complexity =  1.6
+## Test of the hypothesis that 4 factors are sufficient.
+## 
+## The degrees of freedom for the null model are  190  and the objective function was  17.23 with Chi Square of  1111.38
+## The degrees of freedom for the model are 116  and the objective function was  5.26 
+## 
+## The root mean square of the residuals (RMSR) is  0.06 
+## The df corrected root mean square of the residuals is  0.07 
+## 
+## The harmonic number of observations is  70 with the empirical chi square  80.9  with prob &lt;  0.99 
+## The total number of observations was  73  with Likelihood Chi Square =  325.27  with prob &lt;  9.7e-22 
+## 
+## Tucker Lewis Index of factoring reliability =  0.608
+## RMSEA index =  0.157  and the 90 % confidence intervals are  0.138 0.179
+## BIC =  -172.42
+## Fit based upon off diagonal values = 0.98
+## Measures of factor score adequacy             
+##                                                    PA1  PA3  PA2  PA4
+## Correlation of (regression) scores with factors   0.96 0.97 0.93 0.92
+## Multiple R square of scores with factors          0.93 0.93 0.87 0.85
+## Minimum correlation of possible factor scores     0.85 0.86 0.75 0.70</code></pre>
+<pre class="r"><code>yqolsf_scores_merge &lt;- read_csv(&quot;yqolsf_factor_ready.csv&quot;)</code></pre>
+<pre><code>## 
+## -- Column specification --------------------------------------------------------
+## cols(
+##   record_id = col_double(),
+##   r07 = col_double(),
+##   r08 = col_double(),
+##   r11 = col_double(),
+##   r13 = col_double(),
+##   r16 = col_double(),
+##   r19 = col_double(),
+##   r20 = col_double(),
+##   r24 = col_double(),
+##   r26 = col_double(),
+##   r27 = col_double(),
+##   r32 = col_double(),
+##   r34 = col_double(),
+##   r35 = col_double(),
+##   r36 = col_double(),
+##   r37 = col_double(),
+##   r38 = col_double(),
+##   yqolsf_complete = col_double()
+## )</code></pre>
+<pre class="r"><code>yqolsf_scores_merge &lt;- yqolsf_scores_merge %&gt;% 
+  filter(yqolsf_complete == 2) %&gt;% 
+  select(-yqolsf_complete) %&gt;%  
+  mutate(average_yqol = (r07+r08+r11+r13+r16+r19+r20+r24+r26+r27+r32+r34+r35+r36+r37+r38)/16)
+
+
+sl_survey_scores_merge &lt;- read_csv(&quot;sl_survey_data.csv&quot;)</code></pre>
+<pre><code>## 
+## -- Column specification --------------------------------------------------------
+## cols(
+##   .default = col_double(),
+##   q31_experience = col_character()
+## )
+## i Use `spec()` for the full column specifications.</code></pre>
+<pre class="r"><code>sl_survey_scores_merge &lt;- sl_survey_scores_merge %&gt;% 
+  filter(streetlight_evaluation_survey_complete == 2) %&gt;% 
+  select(-streetlight_evaluation_survey_complete,-q31_experience, -q21_lounge_fun, -q22_lounge_friends, -q23_lounge_age,-q24_slmemb_ill,-q25_outpat_trans_talk,-q26_outpattrans_friend, -q27_adulttrans_talk,-q28_adulttrans_friend,-q30_cf_yearbook,-hospital_now) %&gt;%
+  mutate(average_sl = (q1_control+q2_getalong_hosp+q3_getalong_fam+q4_easier_tasks+q5_diversion+q6_roomhang_fun+q7_friends_roomhang+q8_talk_badday+q_32+q10_respect+q11_respect_all+q12_imp+q13_badday_there+q14_there_hang+q15_sl_friends+q16_hang_better+q17_eot_good+q18_imp_treat_event+q19_happy_mem+q20_fundraise)/20)
+
+scores_merged &lt;- left_join(yqolsf_scores_merge, sl_survey_scores_merge, by = &quot;record_id&quot;)
+scores_merged_clean &lt;- scores_merged %&gt;% 
+  select(average_sl,average_yqol,record_id)
+
+model &lt;- lm(average_yqol~average_sl,data=scores_merged_clean)
+summary(model)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = average_yqol ~ average_sl, data = scores_merged_clean)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.70941 -0.23795  0.03181  0.22809  0.36364 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  2.22637    0.33857   6.576 3.01e-08 ***
+## average_sl   0.09661    0.07486   1.291    0.203    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.2724 on 49 degrees of freedom
+##   (17 observations deleted due to missingness)
+## Multiple R-squared:  0.03287,    Adjusted R-squared:  0.01314 
+## F-statistic: 1.666 on 1 and 49 DF,  p-value: 0.2029</code></pre>
+<pre class="r"><code>describe(scores_merged_clean)</code></pre>
+<pre><code>##              vars  n  mean    sd median trimmed   mad  min max range  skew
+## average_sl      1 58  4.48  0.55   4.60    4.56  0.52 2.75   5  2.25 -1.31
+## average_yqol    2 56  2.63  0.29   2.69    2.65  0.37 2.00   3  1.00 -0.38
+## record_id       3 68 41.75 27.55  36.50   40.18 26.69 3.00  97 94.00  0.54
+##              kurtosis   se
+## average_sl       1.19 0.07
+## average_yqol    -1.04 0.04
+## record_id       -0.91 3.34</code></pre>
+<p><a href="https://lavaan.ugent.be/tutorial/cfa.html" class="uri">https://lavaan.ugent.be/tutorial/cfa.html</a></p>
+</div>
+</div>
+<div id="r-conf-factor-analysis" class="section level1">
+<h1>r conf-factor-analysis</h1>
+<p>#str(sl_survey_scores) # ##Belief in self and family # ## need to change path, this is actually for YQOL EFA # #path &lt;- ’ self_and_family =~ r07 + r08 + r16 + r19 + r20 # env_and_relationships =~ r24 + r26 + r27 + r32 #+ r34 + r35 ’ # #model &lt;- cfa(path, data= sl_survey_scores) #summary(model, fit.measures=TRUE)</p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

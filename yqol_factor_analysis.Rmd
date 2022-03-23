@@ -6,7 +6,6 @@ output: html_document
 editor_options: 
   markdown: 
     wrap: 72
-bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -15,7 +14,7 @@ library(tidyverse)
 library(lavaan)
 library(psych)
 library(corrplot)
-library("psych")
+library(psych)
 library(ggplot2)
 library(GPArotation)
 ```
@@ -53,7 +52,7 @@ ggplot(scree, aes(x = Factor_n, y = Eigenvalue, group = 1)) +
   ylab("Initial eigenvalue") +
   labs( title = "Scree Plot", 
         subtitle = "(Based on the unreduced correlation matrix)")
-alpha(sl_survey_scores)
+psych::alpha(yqolsf_scores)
 
 ```
 
