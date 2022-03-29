@@ -84,6 +84,68 @@ write_csv(sl_survey_factor_data, "sl_survey_loadings.csv")
 
 ```
 
+
+```{r dataload-round-2}
+sl_survey_scores_round_2 <- sl_survey_scores %>% 
+  select(-q20_fundraise,-q5_diversion,-q12_imp,-q10_respect)
+
+#Dropping items with <.40 loadings, seem to be ones potentially answered by other questions, or related to fundraising (my be related to if there are actually events related to disease)
+```
+
+# EFA
+
+
+## Exploratory analyses, Eigenvalue scree plot
+```{r efa-round-2}
+datamatrix <- cor(sl_survey_scores_round_2, method = "pearson", use = "complete.obs")
+corrplot(datamatrix, method="number")
+KMO(r=cor(sl_survey_scores_round_2,method = "pearson", use = "complete.obs"))
+cortest.bartlett(sl_survey_scores_round_2)
+det(cor(sl_survey_scores_round_2,method = "pearson", use = "complete.obs"))
+
+fafitfree <- fa(sl_survey_scores_round_2,nfactors = ncol(sl_survey_scores_round_2), rotate = "none")
+n_factors <- length(fafitfree$e.values)
+scree     <- data.frame(
+  Factor_n =  as.factor(1:n_factors), 
+  Eigenvalue = fafitfree$e.values)
+ggplot(scree, aes(x = Factor_n, y = Eigenvalue, group = 1)) + 
+  geom_point() + geom_line() +
+  xlab("Number of factors") +
+  ylab("Initial eigenvalue") +
+  labs( title = "Scree Plot", 
+        subtitle = "(Based on the unreduced correlation matrix)")
+alpha(sl_survey_scores_round_2)
+```
+
+![](http://127.0.0.1:39867/chunk_output/052A8F2CF5333BA4/8D377EBD/cgaqowjio2537/00000f.png?fixed_size=1)
+
+### 3 Factor model
+
+```{r efa-3-factor-round-2}
+fa.none <- fa(r=sl_survey_scores_round_2,nfactors = 3, fm="mle", max.iter=100, rotate="oblimin") 
+print(fa.none)
+
+loadings <- unclass(fa.none$loadings)
+h2 <- fa.none$communalities
+#There is also factors_data$communality which has same values
+u2 <- fa.none$uniquenesses
+com <- fa.none$complexity
+question <- fa.none$complexity
+sl_survey_factor_data <- cbind(loadings, h2, u2, com)
+sl_survey_factor_data <- as.data.frame(sl_survey_factor_data)
+sl_survey_factor_data <- tibble::rownames_to_column(sl_survey_factor_data, "question")
+
+write_csv(sl_survey_factor_data, "sl_survey_loadings_round_2.csv")
+
+
+
+
+```
+
+
+
+
+
 # Factor loadings
 
 ## 3 Factor loadings
@@ -179,7 +241,7 @@ PA3:
 ## 4-factor 
 
 ```{r efa-4}
-fa.four <- fa(r=sl_survey_scores,nfactors = 4, fm="pa", max.iter=100, rotate="oblimin") 
+fa.four <- fa(r=sl_survey_scores,nfactors = 4, fm="mle", max.iter=100, rotate="oblimin") 
 print(fa.four)
 ```
 

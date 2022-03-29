@@ -92,5 +92,20 @@ model_sl_and_yqol <- lm(yqol_outcomes_avg ~ sl_outcomes_avg, data = sl_demo_clea
 summary(model_sl_and_yqol)
 
 # none found here
+
+## Add age 
+model_age_yqol <- lm(yqol_outcomes_avg~age, data = sl_demo_clean)
+summary(model_age_yqol)
+
+model_age_sl <- lm(sl_outcomes_avg~age, data= sl_demo_clean)
+summary(model_age_sl)
+
+# and gender 
+
+model_gender_yqol <- lm(yqol_outcomes_avg~gender, data = sl_demo_clean)
+summary(model_gender_yqol)
+
+model_gender_sl <- lm(sl_outcomes_avg~gender, data= sl_demo_clean)
+summary(model_gender_sl)
 ```
 

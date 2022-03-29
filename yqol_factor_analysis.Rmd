@@ -74,6 +74,66 @@ write_csv(yqsol_factor_loadings, "yqsol_factor_loadings.csv")
 ```
 
 
+# Second Round EFA
+
+* Due to low factor loadings on questions related to school/education, we wanted to assess the impact of dropping these items on the resulting factor loadings. 
+
+* Questions dropping were <.4 :
+**    r38 : I feel safe when I am at school (please choose the number) (.24 max loading)
+
+**    r35: feel I am getting a good education (please choose the number (.27 max loading)
+
+-- maybe?
+**  r 34: I feel safe when I am at home: I feel safe when I am at home (please choose the number) (.24 max loading)
+
+** r37: I enjoy learning new things? (.30 max loading)
+
+** r13 i feel most adults treat me fairly (.37 max loading)
+
+
+```{r round-2-dropping-school}
+yqolsf_scores_round2 <- yqolsf_scores %>% 
+  select(-r38,-r35,-r34, -r37, -r13)
+```
+
+```{r round-2-efa}
+datamatrix_2 <- cor(yqolsf_scores_round2, method = "pearson", use = "complete.obs")
+corrplot(datamatrix_2, method="number")
+KMO(r=cor(yqolsf_scores_round2,method = "pearson", use = "complete.obs"))
+cortest.bartlett(yqolsf_scores_round2)
+det(cor(yqolsf_scores_round2,method = "pearson", use = "complete.obs"))
+
+fafitfree <- fa(yqolsf_scores_round2,nfactors = ncol(yqolsf_scores_round2), rotate = "none")
+n_factors <- length(fafitfree$e.values)
+scree     <- data.frame(
+  Factor_n =  as.factor(1:n_factors), 
+  Eigenvalue = fafitfree$e.values)
+ggplot(scree, aes(x = Factor_n, y = Eigenvalue, group = 1)) + 
+  geom_point() + geom_line() +
+  xlab("Number of factors") +
+  ylab("Initial eigenvalue") +
+  labs( title = "Scree Plot", 
+        subtitle = "(Based on the unreduced correlation matrix)")
+psych::alpha(yqolsf_scores_round2)
+
+```
+
+```{r efa-3-factor-round-2}
+fa.none <- fa(r=yqolsf_scores_round2,nfactors = 3, fm="mle", max.iter=100, rotate="oblimin") 
+print(fa.none)
+
+
+loadings <- unclass(fa.none$loadings)
+h2 <- fa.none$communalities
+#There is also factors_data$communality which has same values
+u2 <- fa.none$uniquenesses
+com <- fa.none$complexity
+yqsol_factor_loadings_2 <- cbind(loadings, h2, u2, com)
+yqsol_factor_loadings_2 <- as.data.frame(yqsol_factor_loadings_2)
+yqsol_factor_loadings_2 <- tibble::rownames_to_column(yqsol_factor_loadings_2, "question")
+
+write_csv(yqsol_factor_loadings_2, "yqsol_factor_loadings_round_2.csv")
+```
 # CFA based on [@hoang2021]
 
 ## Factor 1: Belief in self and family
