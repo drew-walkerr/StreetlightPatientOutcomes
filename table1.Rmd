@@ -32,8 +32,8 @@ sl_demo_raw$other_disease <- as.factor(sl_demo_raw$other_disease)
 sl_demo_clean <- sl_demo_raw %>% 
   mutate(interview_requested = case_when(is.na(interview_request_name) ~ "No",
                                          TRUE ~ "Yes"),
-         sl_outcomes_avg = (q1_control+q2_getalong_hosp+q3_getalong_fam+q4_easier_tasks+q5_diversion+q6_roomhang_fun+q7_friends_roomhang+q8_talk_badday+q_32+q10_respect+q11_respect_all+q12_imp+q13_badday_there+q14_there_hang+q15_sl_friends+q16_hang_better+q17_eot_good+q18_imp_treat_event+q19_happy_mem+q20_fundraise)/20,
-         yqol_outcomes_avg = (r07+r08+r11+r13+r16+r19+r20+r24+r26+r27+r32+r34+r35+r36+r37+r38)/16)
+         sl_outcomes_avg = (q1_control+q2_getalong_hosp+q3_getalong_fam+q4_easier_tasks+q6_roomhang_fun+q7_friends_roomhang+q8_talk_badday+q_32+q11_respect_all+q13_badday_there+q14_there_hang+q15_sl_friends+q16_hang_better+q17_eot_good+q18_imp_treat_event+q19_happy_mem)/16,
+         yqol_outcomes_avg = (r07+r08+r11+r16+r19+r20+r24+r26+r27+r32+r36)/11)
            
 
 # ones not applicable to all
