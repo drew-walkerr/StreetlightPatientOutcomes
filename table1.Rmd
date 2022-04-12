@@ -15,6 +15,11 @@ library(haven)
 sl_demo_raw <- read_csv("table1.csv")
 
 str(sl_demo_raw)
+sl_demo_raw$record_id <- as.character(sl_demo_raw$record_id)
+sl_demo_raw <- sl_demo_raw %>% 
+  filter(record_id != "94") %>% 
+  filter(record_id != "95") %>% 
+  filter(record_id != "98")
 
 sl_demo_raw$streetlight_evaluation_survey_complete <- as.factor(sl_demo_raw$streetlight_evaluation_survey_complete)
 sl_demo_raw$yqolsf_complete <- as.factor(sl_demo_raw$yqolsf_complete)
@@ -77,7 +82,7 @@ sl_demo_clean$school___9 <- as.factor(sl_demo_clean$school___9)
 sl_demo_clean$hospital_now <- as.factor(sl_demo_clean$hospital_now)
 
 
-table1(~streetlight_evaluation_survey_complete + yqolsf_complete + demographic_questionnaire_complete + gender + diagnosis + ethnicity + other_disease + interview_requested + age + yqol_outcomes_avg +sl_outcomes_avg + school___1 +school___2+ school___3+ school___4+school___5+ school___6+ school___7+ school___8+ school___9 + hospital_now, data = sl_demo_clean )
+table1(~streetlight_evaluation_survey_complete + yqolsf_complete + demographic_questionnaire_complete + gender + diagnosis + ethnicity + other_disease + interview_requested + age + yqol_outcomes_avg +sl_outcomes_avg + school___1 +school___2+ school___3+ school___4+school___5+ school___6+ school___7+ school___8+ school___9 + hospital_now + q21_lounge_fun + q22_lounge_friends + q23_lounge_age + q24_slmemb_ill + q25_outpat_trans_talk + q26_outpattrans_friend + q27_adulttrans_talk + q28_adulttrans_friend + q30_cf_yearbook + q31_experience, data = sl_demo_clean )
 ```
 # Sensitivity/logistic regressions for qual of life and SL eval outcome scores
 * if ppl selected to interview-- no significant relationship
