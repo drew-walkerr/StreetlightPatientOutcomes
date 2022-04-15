@@ -266,7 +266,7 @@ ggsave(word_count_bar_filename)
 # Other (anything else about) sl experience
 ```{r sl-descriptions-wordcloud-helpful}
 library(tm)
-library(wordcloud)
+library(wordcloud2)
 # sl_demo_clean$exp_other and sl_demo_clean$q31_experience 
 
 text <- rbind(sl_demo_clean$exp_other)
@@ -285,8 +285,7 @@ words <- sort(rowSums(matrix),decreasing=TRUE)
 df <- data.frame(word = names(words),freq=words)
 set.seed(4275) # for reproducibility 
 wordcloud(words = df$word, freq = df$freq, min.freq = 1,           
-          max.words=100, random.order=FALSE, rot.per=0.35,           
-          colors=brewer.pal(8, "Dark2"))
+           max.words=50, random.order=FALSE, rot.per=0.35,colors=brewer.pal(8, "Dark2"))
 
 word_count <- df %>% 
   filter(word != "") %>% 
@@ -343,7 +342,7 @@ combined_words <- combined %>%
   ungroup()
 combined_tf_idf <- combined_words %>% 
   bind_tf_idf(word,question.x,n) %>% 
-  arrange(desc(tf_idf)) %>% 
+  arrange(desc(tf_idf))%>% 
   bind_log_odds(feature = word, set = question.x, n = n) %>% 
   mutate(lo_abs = abs(log_odds_weighted))
 combined_tf_idf %>%
