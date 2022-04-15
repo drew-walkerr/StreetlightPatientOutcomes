@@ -311,15 +311,10 @@ word_count_bar_filename <- paste0(here("other_word_count"),st,".png")
 ggsave(word_count_bar_filename)
 
 
-not_na <- combined %>% 
-  filter(!is.na(combined))
-
-unique_words <- combined_words %>% 
-  distinct(word)
 ```
 
 tf-idf other and helpful 
-```{r tf-idf }
+```{r tf-idf}
 library(tidytext)
 library(tidylo)
 other <- as.tibble(sl_demo_clean$exp_other)
@@ -331,12 +326,15 @@ helpful <- helpful %>%
 combined <- rbind(other,helpful)
 combined <- combined %>% 
   mutate(id = row_number())
-
+stopwords <- stopwords::stopwords()
 combined_id <- combined %>% 
   select(id, question)
 combined_words <- combined %>% 
   unnest_tokens(word,value) %>% 
-  left_join(combined_id,by = "id") %>% 
+  left_join(combined_id,by = "id") 
+
+combined_words <- combined_words %>% 
+filter(!word %in% stopwords) %>% 
   group_by(question.x) %>% 
   count(word,sort = TRUE,.drop = TRUE) %>% 
   ungroup()
