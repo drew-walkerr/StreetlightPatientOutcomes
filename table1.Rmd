@@ -194,8 +194,17 @@ library(tm)
 library(wordcloud)
 # sl_demo_clean$exp_other and sl_demo_clean$q31_experience 
 
-text <- rbind(sl_demo_clean$exp_other,sl_demo_clean$q31_experience)
-text <- str_replace_all(text, fixed("narrative", ignore_case = TRUE), "")
+exp_other <- as_tibble(sl_demo_clean$exp_other) %>% 
+  drop_na() %>% 
+  mutate(question = "other")
+exp_helpful <- as_tibble(sl_demo_clean$q31_experience) %>% 
+  drop_na() %>% 
+  mutate(question = "helpful")
+
+text <- bind_rows(exp_other,exp_helpful)
+
+write_csv(text,"open_response_questions.csv")
+text <- str_replace_all(text$value, fixed("narrative", ignore_case = TRUE), "")
 docs <- Corpus(VectorSource(text))
 docs <- docs %>% 
   tm_map(removeNumbers) %>%
@@ -210,7 +219,7 @@ words <- sort(rowSums(matrix),decreasing=TRUE)
 df <- data.frame(word = names(words),freq=words)
 set.seed(4275) # for reproducibility 
 wordcloud(words = df$word, freq = df$freq, min.freq = 2,           
-          max.words=200, random.order=FALSE, rot.per=0.35,           
+          max.words=100, random.order=FALSE, rot.per=0.35,           
           colors=brewer.pal(8, "Dark2"))
 
 ```
