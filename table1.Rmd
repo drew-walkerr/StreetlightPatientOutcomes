@@ -159,27 +159,35 @@ summary(model_gender_sl)
 
 model_yqol_sl_outcomes <- lm(yqol_outcomes_st~sl_outcomes_st, data= sl_demo_clean)
 summary(model_yqol_sl_outcomes)
+confint(model_yqol_sl_outcomes)
 
 model_yqol_sl_friend <- lm(yqol_outcomes_st~sl_friends_st, data= sl_demo_clean)
 summary(model_yqol_sl_friend)
+confint(model_yqol_sl_friend)
 
 ## Specific SL Factors sl_friends, sl_family, sl_diversion
 
 model_yqol_sl_factors <- lm(yqol_outcomes_st~sl_friends_st + sl_family_st + sl_diversion_st, data= sl_demo_clean)
 summary(model_yqol_sl_factors)
-
+confint(model_yqol_sl_factors)
 
 model_friends_sl_factors <- lm(yqol_env_and_relationships_st~sl_friends_st, data= sl_demo_clean)
 summary(model_friends_sl_factors)
+confint(model_friends_sl_factors)
+
 
 model_friends_sl_diversion <- lm(yqol_env_and_relationships_st~sl_diversion_st, data = sl_demo_clean)
 summary(model_friends_sl_diversion)
+confint(model_friends_sl_diversion)
 
 model_friends_sl_family <- lm(yqol_env_and_relationships_st~sl_family, data = sl_demo_clean)
 summary(model_friends_sl_family)
+confint(model_friends_sl_family)
+
 
 model_friends_sl_outcomes_avg <- lm(yqol_env_and_relationships_st~sl_outcomes_st, data= sl_demo_clean)
 summary(model_friends_sl_outcomes_avg)
+confint(model_friends_sl_outcomes_avg)
 ## Redoing with sums as sensitivity check 
 
 #yqol_friends, yqol_family ,yqol_meaning 
