@@ -9,13 +9,14 @@ output: html_document
 library(tidyverse)
 library(table1)
 library(haven)
+library(sjPlot)
+library(sjmisc)
+library(sjlabelled)
+
 ```
 
 ```{r read-data}
 sl_demo_raw <- read_csv("table1.csv")
-
-str(sl_demo_raw)
-
 
 sl_demo_raw$streetlight_evaluation_survey_complete <- as.factor(sl_demo_raw$streetlight_evaluation_survey_complete)
 sl_demo_raw$yqolsf_complete <- as.factor(sl_demo_raw$yqolsf_complete)
@@ -45,18 +46,27 @@ sl_demo_clean <- sl_demo_raw %>%
          sl_diversion = (q19_happy_mem+q11_respect_all+q6_roomhang_fun+q16_hang_better)/4,
          sl_diversion_st = scale(sl_diversion),
          sl_diversion_sum = (q19_happy_mem+q11_respect_all+q6_roomhang_fun+q16_hang_better),
-         yqol_friends = (r27+r24+r07+r26+r08)/5,
-         yqol_friends_sum = (r27+r24+r07+r26+r08),
-         yqol_family = (r19+r16+r20+r36)/4,
-         yqol_family_sum = (r19+r16+r20+r36),
-         yqol_meaning = (r32+r11)/2,
-         yqol_meaning_sum = (r32+r11),
-         yqol_outcomes_avg = (r07+r08+r11+r16+r19+r20+r24+r26+r27+r32+r36+r38+r13+r35+r37+r34)/16,
+         t_r07 = (((r07 - 1)/2)*100),
+         t_r08 = (((r08 - 1)/2)*100),
+         t_r11 = (((r11 - 1)/2)*100),
+         t_r16 = (((r16 - 1)/2)*100),
+         t_r19 = (((r19 - 1)/2)*100),
+         t_r20 = (((r20 - 1)/2)*100),
+         t_r24 = (((r24 - 1)/2)*100),
+         t_r26 = (((r27 - 1)/2)*100),
+         t_r27 = (((r27 - 1)/2)*100),
+         t_r32 = (((r32 - 1)/2)*100),
+         t_r36 = (((r36 - 1)/2)*100),
+         t_r38 = (((r38 - 1)/2)*100),
+         t_r13 = (((r13 - 1)/2)*100),
+         t_r35 = (((r35 - 1)/2)*100),
+         t_r37 = (((r37 - 1)/2)*100),
+         t_r34 = (((r34 - 1)/2)*100),
+         yqol_outcomes_avg = (t_r07+t_r08+t_r11+t_r16+t_r19+t_r20+t_r24+t_r26+t_r27+t_r32+t_r36+t_r38+t_r13+t_r35+t_r37+t_r34)/16,
          yqol_outcomes_st = scale(yqol_outcomes_avg),
-         yqol_outcomes_sum = (r07+r08+r11+r16+r19+r20+r24+r26+r27+r32+r36),
-         yqol_self_and_family = (r07+r08+r16+r19+r20)/5,
+         yqol_self_and_family = (t_r07+t_r08+t_r16+t_r19+t_r20)/5,
          yqol_self_and_family_st = scale(yqol_self_and_family),
-         yqol_env_and_relationships = (r24+r26+r27+r32+r34+r35)/6,
+         yqol_env_and_relationships = (t_r24+t_r26+t_r27+t_r32+t_r34+t_r35)/6,
          yqol_env_and_relationships_st = scale(yqol_env_and_relationships))
            
 
@@ -78,7 +88,7 @@ sl_demo_clean$school___9 <- as.factor(sl_demo_clean$school___9)
 sl_demo_clean$hospital_now <- as.factor(sl_demo_clean$hospital_now)
 
 
-table1(~streetlight_evaluation_survey_complete + yqolsf_complete + demographic_questionnaire_complete + gender + diagnosis + ethnicity + other_disease + interview_requested + age + yqol_outcomes_avg +sl_outcomes_avg + school___1 +school___2+ school___3+ school___4+school___5+ school___6+ school___7+ school___8+ school___9 + hospital_now + q21_lounge_fun + q22_lounge_friends + q23_lounge_age + q24_slmemb_ill + q25_outpat_trans_talk + q26_outpattrans_friend + q27_adulttrans_talk + q28_adulttrans_friend + q30_cf_yearbook + q31_experience + exp_other, data = sl_demo_clean )
+table1(~streetlight_evaluation_survey_complete + yqolsf_complete + demographic_questionnaire_complete + gender + diagnosis + ethnicity + other_disease + interview_requested + age + yqol_outcomes_avg + yqol_self_and_family + yqol_env_and_relationships + +sl_outcomes_avg + school___1 +school___2+ school___3+ school___4+school___5+ school___6+ school___7+ school___8+ school___9 + hospital_now + q21_lounge_fun + q22_lounge_friends + q23_lounge_age + q24_slmemb_ill + q25_outpat_trans_talk + q26_outpattrans_friend + q27_adulttrans_talk + q28_adulttrans_friend + q30_cf_yearbook + q31_experience + exp_other, data = sl_demo_clean )
 
 open_ended_survey_df <- sl_demo_clean %>% 
   filter(!is.na(exp_other)|!is.na(q31_experience)) %>% 
@@ -190,7 +200,6 @@ summary(model_friends_sl_outcomes_avg)
 confint(model_friends_sl_outcomes_avg)
 ## Redoing with sums as sensitivity check 
 
-#yqol_friends, yqol_family ,yqol_meaning 
 
 
 ## Specific SL Factors sl_friends, sl_family, sl_diversion
@@ -374,3 +383,109 @@ combined_tf_idf %>%
   theme_classic()
 ```
 
+
+# Revisions Models
+
+* Want to assess SL scores as predictors for YQOL scores, broken by total avg score and factor specific scores
+
+```{r revision-descriptives}
+table1(~yqol_outcomes_avg + yqol_self_and_family + yqol_env_and_relationships +sl_outcomes_avg + sl_diversion + sl_family + sl_friends + sl_diversion, data = sl_demo_clean )
+```
+
+```{r revision-models}
+table1(~yqol_outcomes_avg + yqol_self_and_family + yqol_env_and_relationships +sl_outcomes_avg + sl_diversion + sl_family + sl_friends + sl_diversion, data = sl_demo_clean )
+
+
+#Covariates: age, gender, diagnosis
+#Average SL x Average YQOL
+model_yqol_sl_avg <- lm(yqol_outcomes_avg~sl_outcomes_avg +age + gender, data= sl_demo_clean)
+summary(model_yqol_sl_avg)
+confint(model_yqol_sl_avg)
+
+# SL Friendships x yqol avg 
+
+model_yqol_sl_friend <- lm(yqol_outcomes_avg~sl_friends + age + gender , data= sl_demo_clean)
+summary(model_yqol_sl_friend)
+confint(model_yqol_sl_friend)
+
+##  sl_family x average
+
+model_yqol_sl_family <- lm(yqol_outcomes_avg~sl_family + age + gender, data= sl_demo_clean)
+summary(model_yqol_sl_family)
+confint(model_yqol_sl_family)
+
+# sl_diversion x average yqol
+model_yqol_avg_sl_diversion <- lm(yqol_outcomes_avg~sl_diversion + age + gender, data= sl_demo_clean)
+summary(model_yqol_avg_sl_diversion)
+confint(model_yqol_avg_sl_diversion)
+
+
+
+```
+
+## Model tables 
+
+### YQOL Average as Outcome
+```{r model-revisions-table}
+tab_model(model_yqol_sl_avg, model_yqol_sl_friend, model_yqol_sl_family,model_yqol_avg_sl_diversion, dv.labels = c("Streetlight Eval Avg","SL- Friendships and Support", " SL- Family and Coping", "SL- Diversion and Respect"), show.aic = TRUE, show.dev = TRUE)
+```
+
+### YQOL Env and Relationships as Outcome
+```{r env-and-relrevision-models}
+#Covariates: age, gender, diagnosis
+#Average SL x Average YQOL
+model_yqol_env_sl_avg <- lm(yqol_env_and_relationships~sl_outcomes_avg +age + gender, data= sl_demo_clean)
+summary(model_yqol_env_sl_avg)
+confint(model_yqol_env_sl_avg)
+
+# SL Friendships x yqol env 
+
+model_yqol_env_sl_friend <- lm(yqol_env_and_relationships~sl_friends + age + gender , data= sl_demo_clean)
+summary(model_yqol_env_sl_friend)
+confint(model_yqol_env_sl_friend)
+
+##  sl_family x yqol env
+
+model_yqol_env_sl_family <- lm(yqol_env_and_relationships~sl_family + age + gender, data= sl_demo_clean)
+summary(model_yqol_env_sl_family)
+confint(model_yqol_env_sl_family)
+
+# sl_diversion x average yqol
+model_yqol_env_sl_diversion <- lm(yqol_env_and_relationships~sl_diversion + age + gender, data= sl_demo_clean)
+summary(model_yqol_env_sl_diversion)
+confint(model_yqol_env_sl_diversion)
+
+# Env and Relationships Outcome Table
+tab_model(model_yqol_env_sl_avg, model_yqol_env_sl_friend, model_yqol_env_sl_family,model_yqol_env_sl_diversion, dv.labels = c("Streetlight Eval Avg","SL- Friendships and Support", " SL- Family and Coping", "SL- Diversion and Respect"), show.aic = TRUE, show.dev = TRUE)
+
+```
+
+
+### YQOL Self and Family as Outcome
+```{r yqol-self-and-family-revision-models}
+#Covariates: age, gender, diagnosis
+#Average SL x Average YQOL
+model_yqol_self_sl_avg <- lm(yqol_self_and_family~sl_outcomes_avg +age + gender, data= sl_demo_clean)
+summary(model_yqol_self_sl_avg)
+confint(model_yqol_self_sl_avg)
+
+# SL Friendships x yqol env 
+
+model_yqol_self_sl_friend <- lm(yqol_self_and_family~sl_friends + age + gender , data= sl_demo_clean)
+summary(model_yqol_self_sl_friend)
+confint(model_yqol_self_sl_friend)
+
+##  sl_family x yqol env
+
+model_yqol_self_sl_family <- lm(yqol_self_and_family~sl_family + age + gender, data= sl_demo_clean)
+summary(model_yqol_self_sl_family)
+confint(model_yqol_self_sl_family)
+
+# sl_diversion x average yqol
+model_yqol_self_sl_diversion <- lm(yqol_self_and_family~sl_diversion + age + gender, data= sl_demo_clean)
+summary(model_yqol_self_sl_diversion)
+confint(model_yqol_self_sl_diversion)
+
+# yqol_self_and_family Outcome Table
+tab_model(model_yqol_self_sl_avg, model_yqol_self_sl_friend,model_yqol_self_sl_family, model_yqol_self_sl_diversion, dv.labels = c("Streetlight Eval Avg","SL- Friendships and Support", " SL- Family and Coping", "SL- Diversion and Respect"), show.aic = TRUE, show.dev = TRUE)
+```
