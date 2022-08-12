@@ -99,7 +99,14 @@ pooled_kappa_codes <- combined_df_categories_coders_wide %>%
   select("1","2")
 kappa2(pooled_kappa_codes)
 
-
-
 ```
+## List of disagreements 
+```{r list-o-disagreements}
+disagreements_df <- combined_df_categories_coders_wide %>% 
+  mutate(agree = case_when(`1` == 0 & `2` == 0 | `1` == 1 & `2` == 1 ~ "1", TRUE ~"0")) %>% 
+  filter(agree == "0")
+disagreements_df
+write_csv(disagreements_df, "disagreements.csv")
+```
+
 
