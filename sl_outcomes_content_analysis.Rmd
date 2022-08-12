@@ -49,6 +49,8 @@ combined_df[is.na(combined_df)] <- 0
 
 ```
 
+
+# Per-category kappas
 ```{r per-category-kappas}
 # Make dataframe for coder 1
 kappas_annotation_data_coder_1 <- merging_annotation_data_coder_1 %>% 
@@ -69,17 +71,21 @@ kappas_combined <- left_join(kappas_annotation_data_coder_1,kappas_annotation_da
 kappas_combined_clean <- kappas_combined %>% select(-id)
 kappas_combined_clean[is.na(kappas_combined_clean)] <- 0
 
-kappas <- kappaCohen(kappas_combined_clean, weight = "unweighted")
+kappas_combined_clean_ordered <- kappas_combined_clean %>% 
+  select(order(colnames(kappas_combined_clean)))
 
-psych::cohen.kappa(combined_df)
+
+kappas <- kappaCohen(kappas_combined_clean_ordered, weight = "unweighted")
 
 kappas
+
 
 kappas_diversion_test <- kappas_combined_clean %>% 
   select(diversion_1,diversion_2)
 kappa2(kappas_diversion_test)
-
 ```
+
+# Pooled kappas 
 
 ```{r pooled-kappas}
 # Can change the cols = columns to specify which the range of the categories
