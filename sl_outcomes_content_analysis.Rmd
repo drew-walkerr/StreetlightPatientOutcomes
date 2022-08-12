@@ -1,0 +1,99 @@
+---
+title: "sl_outcomes_content_analysis"
+author: "Drew Walker"
+date: "10/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(irr)
+library(janitor)
+library(table1)
+library(KappaGUI)
+library(here)
+library(knitr)
+library(gt)
+library(psych)
+here()
+```
+
+
+```{r read_data}
+raw_annotation_data_coder_1 <- read_csv("open_response_questions_coding_sheet_dw.csv") %>% 
+  clean_names()
+
+merging_annotation_data_coder_1 <- raw_annotation_data_coder_1 %>% 
+  mutate(coder = as.factor("1"))
+merging_annotation_data_coder_1$id <- 1:nrow(merging_annotation_data_coder_1)
+
+
+#Column names editing/cleaning 
+
+raw_annotation_data_coder_2 <-read_csv("open_response_questions_coding_sheet_fp.csv") %>% 
+  clean_names() 
+
+merging_annotation_data_coder_2 <- raw_annotation_data_coder_2 %>% 
+  mutate(coder = as.factor("2"))
+
+merging_annotation_data_coder_2$id <- 1:nrow(merging_annotation_data_coder_2)
+
+colnames(raw_annotation_data_coder_2)
+
+combined_df <- bind_rows(merging_annotation_data_coder_1, merging_annotation_data_coder_2)
+str(combined_df)
+
+combined_df[is.na(combined_df)] <- 0
+
+
+```
+
+```{r per-category-kappas}
+# Make dataframe for coder 1
+kappas_annotation_data_coder_1 <- merging_annotation_data_coder_1 %>% 
+  select(-text, -id, -coder,-question)
+# Make column pair name ready for kappa iteration
+colnames(kappas_annotation_data_coder_1) <- paste(colnames(kappas_annotation_data_coder_1),"1",sep="_")
+kappas_annotation_data_coder_1$id <- 1:nrow(kappas_annotation_data_coder_1)
+
+# Make dataframe for coder 2
+kappas_annotation_data_coder_2 <- merging_annotation_data_coder_2 %>% 
+  select(-text, -id, -coder,-question)
+# Make column pair name ready for kappa iteration
+colnames(kappas_annotation_data_coder_2) <- paste(colnames(kappas_annotation_data_coder_2),"2",sep="_")
+kappas_annotation_data_coder_2$id <- 1:nrow(kappas_annotation_data_coder_2)
+
+# merge by id
+kappas_combined <- left_join(kappas_annotation_data_coder_1,kappas_annotation_data_coder_2, by = "id")
+kappas_combined_clean <- kappas_combined %>% select(-id)
+kappas_combined_clean[is.na(kappas_combined_clean)] <- 0
+
+kappas <- kappaCohen(kappas_combined_clean, weight = "unweighted")
+
+psych::cohen.kappa(combined_df)
+
+kappas
+
+kappas_diversion_test <- kappas_combined_clean %>% 
+  select(diversion_1,diversion_2)
+kappa2(kappas_diversion_test)
+
+```
+
+```{r pooled-kappas}
+# Can change the cols = columns to specify which the range of the categories
+combined_df_categories_long <- combined_df %>% 
+  pivot_longer(cols = volunteer_friendships:program_exportation,
+    names_to = "category")
+combined_df_categories_coders_wide <- combined_df_categories_long %>% 
+  pivot_wider(names_from = "coder") 
+
+pooled_kappa_codes <- combined_df_categories_coders_wide %>% 
+  select("1","2")
+kappa2(pooled_kappa_codes)
+
+
+
+```
+
